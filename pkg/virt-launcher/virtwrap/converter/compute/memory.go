@@ -46,9 +46,14 @@ func (r MemoryConfigurator) Configure(vmi *v1.VirtualMachineInstance, domain *ap
 		return err
 	}
 
+	slots := uint64(0)
+	if vmi.Spec.Architecture == "ppc64le" {
+		slots = 16
+	}
 	domain.Spec.MaxMemory = &api.MaxMemory{
 		Unit:  maxMemory.Unit,
 		Value: maxMemory.Value,
+		Slots: slots,
 	}
 
 	currentMemory, err := vcpu.QuantityToByte(*vmi.Spec.Domain.Memory.Guest)

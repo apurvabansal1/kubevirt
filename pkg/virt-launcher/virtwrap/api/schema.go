@@ -572,7 +572,7 @@ type Memory struct {
 type MaxMemory struct {
 	Value uint64 `xml:",chardata"`
 	Unit  string `xml:"unit,attr"`
-	Slots uint64 `xml:"slots,attr"`
+	Slots uint64 `xml:"slots,attr,omitempty"`
 }
 
 // MemoryBacking mirroring libvirt XML under https://libvirt.org/formatdomain.html#elementsMemoryBacking
