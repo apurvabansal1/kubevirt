@@ -62,6 +62,11 @@ case ${ARCHITECTURE} in
         $other_images_default
     "
     ;;
+"ppc64le" | "crossbuild-ppc64le")
+    other_images="
+        $other_images_default
+    "
+    ;;
 "aarch64" | "crossbuild-aarch64")
     other_images="
         $other_images_default
