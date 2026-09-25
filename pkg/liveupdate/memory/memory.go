@@ -68,6 +68,9 @@ func ValidateLiveUpdateMemory(vmSpec *v1.VirtualMachineInstanceSpec, maxGuest *r
 	}
 
 	blockAlignment := HotplugBlockAlignmentBytes
+        if vmSpec.Architecture == "ppc64le" {
+                blockAlignment = 0x10000000 // 256 MiB LMB size for pseries
+        }
 	if domain.Memory != nil &&
 		domain.Memory.Hugepages != nil &&
 		domain.Memory.Hugepages.PageSize == "1Gi" {
@@ -95,7 +98,8 @@ func ValidateLiveUpdateMemory(vmSpec *v1.VirtualMachineInstanceSpec, maxGuest *r
 		return fmt.Errorf("MaxGuest must be %s aligned", alignment)
 	}
 
-	if vmSpec.Architecture != "amd64" {
+	if vmSpec.Architecture != "amd64" &&
+                vmSpec.Architecture != "ppc64le" {
 		return fmt.Errorf("Memory hotplug is only available for x86_64 VMs")
 	}
 
@@ -129,6 +133,17 @@ func BuildMemoryDevice(vmi *v1.VirtualMachineInstance) (*api.MemoryDevice, error
 		domain.Memory.Hugepages.PageSize == "1Gi" {
 		blockAlignment = Hotplug1GHugePagesBlockAlignmentBytes
 	}
+
+        if vmi.Spec.Architecture == "ppc64le" {
+                return &api.MemoryDevice{
+                        Model: "dimm",
+                        Target: &api.MemoryTarget{
+                                Size: pluggableMemorySize,
+                                Node: "0",
+                                // Note: no Block or Requested fields — dimm XML schema differs from virtio-mem
+                        },
+                }, nil
+        }
 
 	return &api.MemoryDevice{
 		Model: "virtio-mem",

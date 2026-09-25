@@ -467,7 +467,18 @@ func (l *LibvirtDomainManager) UpdateGuestMemory(vmi *v1.VirtualMachineInstance)
 		return fmt.Errorf("%s: %v", errMsgPrefix, err)
 	}
 
-	if spec.Devices.Memory != nil {
+        if vmi.Spec.Architecture == "ppc64le" {
+                memoryDeviceXML, err := xml.Marshal(memoryDevice)
+                if err != nil {
+                        log.Log.Reason(err).Error("marshalling target dimm device failed")
+                        return err
+                }
+                err = dom.AttachDeviceFlags(strings.ToLower(string(memoryDeviceXML)), affectDeviceLiveAndConfigLibvirtFlags)
+                if err != nil {
+                        log.Log.Reason(err).Error("attaching dimm device for ppc64le")
+                        return err
+                }
+        } else if spec.Devices.Memory != nil {
 		spec.Devices.Memory.Target.Requested = memoryDevice.Target.Requested
 
 		memoryDeviceXML, err := xml.Marshal(spec.Devices.Memory)

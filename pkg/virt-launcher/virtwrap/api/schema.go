@@ -623,10 +623,10 @@ type MemoryAddress struct {
 
 type MemoryTarget struct {
 	Size      Memory         `xml:"size"`
-	Requested Memory         `xml:"requested"`
+	Requested Memory         `xml:"requested,omitempty"`
 	Current   Memory         `xml:"current"`
 	Node      string         `xml:"node"`
-	Block     Memory         `xml:"block"`
+	Block     Memory         `xml:"block,omitempty"`
 	Address   *MemoryAddress `xml:"address,omitempty"`
 }
 
